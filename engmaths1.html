@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Engineering Mathematics I — Calculus, Live</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@500;600;700&display=swap" rel="stylesheet">
+<script>
+window.MathJax = {
+  tex: { inlineMath: [['$','$']], displayMath: [['$$','$$']] },
+  svg: { fontCache: 'global' },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre','code'] }
+};
+</script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.js" id="mathjax-script" async></script>
+<style>
+  :root{
+    --paper:#FAFAF8;
+    --paper-2:#F3F2ED;
+    --grid:#D9E2ED;
+    --grid-strong:#B9C9DC;
+    --ink:#1B2A4A;
+    --ink-soft:#4E5D7C;
+    --ink-faint:#8592AA;
+    --highlight:#F5C518;
+    --highlight-soft:#FCEDB0;
+    --pen:#BE3B2E;
+    --pen-soft:#F3D8D3;
+    --teal:#1F7A6C;
+    --teal-soft:#D7EBE6;
+    --panel:#FFFFFF;
+    --line:#E3E8EF;
+    --shadow: 0 1px 2px rgba(27,42,74,0.06), 0 8px 24px -12px rgba(27,42,74,0.18);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',system-ui,sans-serif;
+    font-size:16px;
+    line-height:1.6;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background:var(--highlight-soft); }
+  a{ color:inherit; }
+  .mono{ font-family:'IBM Plex Mono',monospace; }
+  .display-font{ font-family:'Fraunces',serif; }
+  .hand{ font-family:'Caveat',cursive; }
+
+  /* ---------- layout ---------- */
+  .app{ display:flex; min-height:100vh; }
+  .sidebar{
+    width:248px; flex-shrink:0;
+    background:var(--ink); color:#EDEFF5;
+    position:sticky; top:0; height:100vh; overflow-y:auto;
+    padding:26px 0 30px;
+  }
+  .sidebar-brand{
+    padding:0 22px 20px; border-bottom:1px solid rgba(255,255,255,0.12); margin-bottom:14px;
+  }
+  .sidebar-brand .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--highlight); }
+  .sidebar-brand h1{ font-family:'Fraunces',serif; font-size:21px; font-weight:600; margin:6px 0 0; line-height:1.25; color:#fff; }
+  .nav-group{ padding:14px 12px 4px; }
+  .nav-group-title{
+    font-family:'IBM Plex Mono',monospace; font-size:10.5px; letter-spacing:.1em; text-transform:uppercase;
+    color:#93A0BE; padding:0 10px 8px;
+  }
+  .nav-link{
+    display:flex; align-items:center; gap:9px;
+    padding:9px 10px; margin:1px 0; border-radius:9px;
+    font-size:14.5px; color:#D9DEEB; text-decoration:none; cursor:pointer;
+    border-left:2px solid transparent;
+  }
+  .nav-link:hover{ background:rgba(255,255,255,0.06); }
+  .nav-link.active{ background:rgba(245,197,24,0.12); color:#fff; border-left:2px solid var(--highlight); }
+  .nav-dot{ width:6px; height:6px; border-radius:50%; background:#5B688B; flex-shrink:0; }
+  .nav-link.active .nav-dot{ background:var(--highlight); }
+  .nav-link.done .nav-dot{ background:var(--teal); }
+
+  .main{ flex:1; min-width:0; }
+  .content{
+    max-width:860px; margin:0 auto; padding:0 28px 100px;
+    background-image:
+      linear-gradient(var(--grid) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+    background-size: 28px 28px;
+    background-position: -1px -1px;
+  }
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:56px 28px 40px; max-width:860px; margin:0 auto;
+    display:grid; grid-template-columns:1.1fr .9fr; gap:36px; align-items:center;
+  }
+  .hero .eyebrow{ font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.14em; text-transform:uppercase; color:var(--pen); }
+  .hero h1{ font-family:'Fraunces',serif; font-weight:600; font-size:clamp(30px,4.2vw,44px); line-height:1.08; margin:10px 0 14px; }
+  .hero p{ color:var(--ink-soft); font-size:16.5px; max-width:44ch; }
+  .hero-canvas-card{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:14px 16px 12px;
+  }
+  .hero-canvas-card canvas{ width:100%; height:200px; display:block; }
+  .hero-readout{
+    display:flex; justify-content:space-between; align-items:baseline; margin-top:6px;
+    font-family:'IBM Plex Mono',monospace; font-size:13px; color:var(--ink-soft);
+  }
+  .hero-readout b{ color:var(--pen); font-size:15px; }
+
+  /* ---------- sections ---------- */
+  section.topic-section{ padding-top:64px; scroll-margin-top:24px; }
+  section.topic-section:first-of-type{ padding-top:20px; }
+  .section-eyebrow{
+    font-family:'IBM Plex Mono',monospace; font-size:12px; letter-spacing:.12em; text-transform:uppercase; color:var(--teal);
+    display:flex; align-items:center; gap:8px;
+  }
+  .section-eyebrow::before{ content:''; width:22px; height:1.5px; background:var(--teal); display:inline-block; }
+  .section-title{ font-family:'Fraunces',serif; font-weight:600; font-size:clamp(24px,3.4vw,32px); margin:8px 0 14px; }
+  .lede{ color:var(--ink-soft); font-size:16px; max-width:66ch; margin-bottom:22px; }
+
+  .panel{
+    background:var(--panel); border:1px solid var(--line); border-radius:var(--radius);
+    box-shadow:var(--shadow); padding:22px 24px; margin-bottom:20px; position:relative;
+  }
+  .panel h3{ font-family:'Fraunces',serif; font-size:19px; font-weight:600; margin:0 0 10px; }
+  .panel h3 .hand-tag{
+    font-family:'Caveat',cursive; font-size:16px; color:var(--pen); font-weight:600;
+    background:var(--pen-soft); padding:1px 9px 2px; border-radius:20px; margin-right:8px; display:inline-block;
+    transform:rotate(-2deg);
+  }
+  .formula-box{
+    background:var(--paper-2); border:1px dashed var(--grid-strong); border-radius:10px;
+    padding:14px 18px; margin:12px 0; overflow-x:auto;
+  }
+  .rules-table{ width:100%; border-collapse:collapse; margin:12px 0; font-size:14.5px; }
+  .rules-table th{ text-align:left; font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-faint); padding:6px 10px; border-bottom:1px solid var(--line); }
+  .rules-table td{ padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top; }
+  .rules-table tr:last-child td{ border-bottom:none; }
+
+  .margin-note{
+    font-family:'Caveat',cursive; font-size:18px; color:var(--pen); line-height:1.3;
+    background:var(--pen-soft); border-radius:10px; padding:8px 14px; margin:14px 0;
+    transform:rotate(-0.6deg); display:inline-block;
+  }
+  .margin-note.teal{ color:var(--teal); background:var(--teal-soft); }
+
+  /* demo panels */
+  .demo{ background:linear-gradient(180deg,#fff,#FCFBF8); border:1px solid var(--line); border-radius:var(--radius); box-shadow:var(--shadow); padding:20px 22px 22px; margin:18px 0 22px; }
+  .demo-label{ font-family:'IBM Plex Mono',monospace; font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-faint); margin-bottom:10px; }
+  .demo-grid{ display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .demo-grid.single{ grid-template-columns:1fr; }
+  .canvas-box{ background:var(--paper-2); border:1px solid var(--grid-strong); border-radius:10px; padding:8px; }
+  .canvas-box canvas{ width:100%; height:260px; display:block; border-radius:6px; }
+  .canvas-box.small canvas{ height:200px; }
+  .controls{ margin-top:14px; }
+  .control-row{ display:flex; align-items:center; gap:10px; margin:9px 0; flex-wrap:wrap; }
+  .control-row label{ font-size:13.5px; color:var(--ink-soft); min-width:120px; }
+  select, input[type=number]{
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px; padding:6px 9px; border-radius:7px; border:1px solid var(--grid-strong); background:#fff; color:var(--ink);
+  }
+  input[type=range]{ flex:1; min-width:120px; accent-color:var(--pen); }
+  .btn{
+    font-family:'Inter',sans-serif; font-weight:600; font-size:13.5px; padding:8px 14px; border-radius:8px;
+    border:1px solid var(--ink); background:var(--ink); color:#fff; cursor:pointer;
+  }
+  .btn.ghost{ background:transparent; color:var(--ink); }
+  .btn.accent{ background:var(--highlight); border-color:var(--highlight); color:var(--ink); }
+  .btn.small{ padding:5px 11px; font-size:12.5px; }
+  .btn:hover{ filter:brightness(0.95); }
+  .readout-row{ display:flex; gap:18px; flex-wrap:wrap; margin-top:12px; }
+  .readout{ background:var(--paper-2); border:1px solid var(--line); border-radius:9px; padding:8px 12px; font-size:13px; }
+  .readout .k{ color:var(--ink-faint); font-size:11px; text-transform:uppercase; letter-spacing:.06em; font-family:'IBM Plex Mono',monospace; }
+  .readout .v{ font-family:'IBM Plex Mono',monospace; font-size:15px; font-weight:600; color:var(--pen); }
+
+  /* examples */
+  .example{ border-left:3px solid var(--teal); padding:4px 0 4px 16px; margin:14px 0; }
+  .example-head{ display:flex; align-items:center; justify-content:space-between; cursor:pointer; }
+  .example-head b{ font-size:14.5px; }
+  .example-toggle-icon{ font-family:'IBM Plex Mono',monospace; color:var(--teal); font-size:13px; }
+  .example-body{ display:none; margin-top:10px; font-size:14.5px; color:var(--ink-soft); }
+  .example-body.open{ display:block; }
+  .example-body ol{ padding-left:20px; }
+  .example-body li{ margin:6px 0; }
+
+  /* practice */
+  .practice{ background:var(--paper-2); border:1px solid var(--grid-strong); border-radius:12px; padding:16px 18px; margin:14px 0; }
+  .practice .q-num{ font-family:'IBM Plex Mono',monospace; font-size:11px; color:var(--ink-faint); text-transform:uppercase; }
+  .practice p.q-text{ font-size:15px; margin:6px 0 12px; font-weight:500; }
+  .mc-options{ display:flex; flex-direction:column; gap:8px; }
+  .mc-option{
+    text-align:left; background:#fff; border:1px solid var(--grid-strong); border-radius:9px; padding:9px 12px;
+    font-family:'IBM Plex Mono',monospace; font-size:13.5px; cursor:pointer; color:var(--ink);
+  }
+  .mc-option:hover{ border-color:var(--ink-soft); }
+  .mc-option.correct{ background:var(--teal-soft); border-color:var(--teal); }
+  .mc-option.incorrect{ background:var(--pen-soft); border-color:var(--pen); }
+  .mc-option:disabled{ cursor:default; }
+  .feedback{ margin-top:10px; font-size:13.5px; padding:10px 12px; border-radius:8px; display:none; }
+  .feedback.show{ display:block; }
+  .feedback.ok{ background:var(--teal-soft); color:#12463c; }
+  .feedback.no{ background:var(--pen-soft); color:#7a2318; }
+  .num-check{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .num-check input{ width:120px; }
+
+  .divider{ height:1px; background:var(--grid-strong); margin:36px 0; }
+  footer{ text-align:center; padding:40px 20px 60px; color:var(--ink-faint); font-size:13px; }
+
+  @media (max-width:900px){
+    .app{ flex-direction:column; }
+    .sidebar{ width:100%; height:auto; position:sticky; top:0; z-index:20; padding:14px 0; display:flex; flex-direction:column; }
+    .sidebar-brand{ padding:0 16px 10px; border-bottom:none; margin-bottom:0; }
+    .sidebar-scroll{ display:flex; overflow-x:auto; gap:4px; padding:8px 12px 4px; }
+    .nav-group{ padding:0; flex-shrink:0; }
+    .nav-group-title{ display:none; }
+    .nav-link{ white-space:nowrap; }
+    .hero{ grid-template-columns:1fr; padding-top:32px; }
+    .demo-grid{ grid-template-columns:1fr; }
+    .content{ padding:0 16px 80px; }
+  }
+</style>
+</head>
+<body>
+<div class="app">
+
+  <!-- ============ SIDEBAR ============ -->
+  <nav class="sidebar">
+    <div class="sidebar-brand">
+      <div class="eyebrow">Engineering Maths I</div>
+      <h1>Calculus, Live</h1>
+    </div>
+    <div class="sidebar-scroll">
+      <div class="nav-group">
+        <div class="nav-group-title">Single-Variable Calculus</div>
+        <a class="nav-link" data-target="sec-limits"><span class="nav-dot"></span>Limits</a>
+        <a class="nav-link" data-target="sec-continuity"><span class="nav-dot"></span>Continuity</a>
+        <a class="nav-link" data-target="sec-differentiation"><span class="nav-dot"></span>Differentiation</a>
+      </div>
+      <div class="nav-group">
+        <div class="nav-group-title">Multivariable Calculus</div>
+        <a class="nav-link" data-target="sec-partials"><span class="nav-dot"></span>Partial Derivatives</a>
+        <a class="nav-link" data-target="sec-gradient"><span class="nav-dot"></span>Gradient &amp; Directional Deriv.</a>
+        <a class="nav-link" data-target="sec-extrema"><span class="nav-dot"></span>Tangent Planes &amp; Extrema</a>
+      </div>
+    </div>
+  </nav>
+
+  <!-- ============ MAIN ============ -->
+  <main class="main">
+    <div class="hero">
+      <div>
+        <div class="eyebrow">A hands-on notebook</div>
+        <h1>Slopes, limits &amp; surfaces — worked out on graph paper.</h1>
+        <p>Every idea in this course reduces to one question: <em>how fast is something changing?</em> Drag the point below and watch a secant line collapse into a tangent — that single motion is the whole idea of differentiation.</p>
+      </div>
+      <div class="hero-canvas-card">
+        <div class="canvas-box small" style="border:none;background:transparent;padding:0;">
+          <canvas id="heroCanvas"></canvas>
+        </div>
+        <div class="hero-readout">
+          <span>h → 0 secant slope</span>
+          <b id="heroSlope" class="mono">—</b>
+        </div>
+        <div class="control-row" style="margin-top:8px;">
+          <input type="range" id="heroSlider" min="0.02" max="2.5" step="0.01" value="2.5">
+        </div>
+      </div>
+    </div>
+
+    <div class="content">
+
+      <!-- ================= LIMITS ================= -->
+      <section class="topic-section" id="sec-limits">
+        <div class="section-eyebrow">Topic 1 · Foundations</div>
+        <h2 class="section-title">Limits</h2>
+        <p class="lede">A limit describes the value a function <em>approaches</em> as the input approaches some point — whether or not the function is actually defined there. It's the idea that makes the rest of calculus rigorous.</p>
+
+        <div class="panel">
+          <h3>Formal idea</h3>
+          <p>We write</p>
+          <div class="formula-box">$$\lim_{x \to c} f(x) = L$$</div>
+          <p>to mean: as $x$ gets arbitrarily close to $c$ (from either side, without necessarily equalling $c$), $f(x)$ gets arbitrarily close to $L$. The precise $\varepsilon$–$\delta$ definition:</p>
+          <div class="formula-box">$$\text{For every } \varepsilon>0,\ \text{there exists } \delta>0 \text{ such that } 0<|x-c|<\delta \implies |f(x)-L|<\varepsilon.$$</div>
+          <p class="margin-note">δ is how close x must be — ε is how close f(x) ends up.</p>
+          <p>A two-sided limit exists only if the <b>left-hand limit</b> $\lim_{x\to c^-}f(x)$ and <b>right-hand limit</b> $\lim_{x\to c^+}f(x)$ both exist and are equal.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Limit laws</h3>
+          <table class="rules-table">
+            <tr><th>Rule</th><th>Statement</th></tr>
+            <tr><td>Sum</td><td>$\lim [f(x)+g(x)] = \lim f(x) + \lim g(x)$</td></tr>
+            <tr><td>Product</td><td>$\lim [f(x)\cdot g(x)] = \lim f(x)\cdot \lim g(x)$</td></tr>
+            <tr><td>Quotient</td><td>$\lim \dfrac{f(x)}{g(x)} = \dfrac{\lim f(x)}{\lim g(x)}$, provided $\lim g(x)\neq 0$</td></tr>
+            <tr><td>Power</td><td>$\lim [f(x)]^n = [\lim f(x)]^n$</td></tr>
+            <tr><td>Squeeze</td><td>If $g(x)\le f(x)\le h(x)$ near $c$ and $\lim g=\lim h=L$, then $\lim f = L$</td></tr>
+          </table>
+          <p><b>Indeterminate forms</b> such as $\frac{0}{0}$ or $\frac{\infty}{\infty}$ don't tell you the limit directly — you must simplify (factor, rationalize) or apply L'Hôpital's rule ($\lim \frac{f}{g}=\lim\frac{f'}{g'}$) once derivatives are available.</p>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Interactive — watch x approach c</div>
+          <div class="demo-grid">
+            <div class="canvas-box"><canvas id="limitCanvas"></canvas></div>
+            <div>
+              <div class="controls">
+                <div class="control-row">
+                  <label for="limitFuncSel">Function</label>
+                  <select id="limitFuncSel">
+                    <option value="removable">(x²−4)/(x−2), c=2</option>
+                    <option value="sinc">sin(x)/x, c=0</option>
+                    <option value="jumpInverse">1/x, c=0</option>
+                    <option value="piecewiseJump">piecewise step, c=1</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="limitSlider">Offset d (x = c+d)</label>
+                  <input type="range" id="limitSlider" min="-1" max="1" step="0.01" value="0.6">
+                </div>
+                <div class="control-row">
+                  <button class="btn small ghost" id="limitLeftBtn">▶ animate from left</button>
+                  <button class="btn small ghost" id="limitRightBtn">animate from right ◀</button>
+                </div>
+              </div>
+              <div class="readout-row">
+                <div class="readout"><div class="k">x</div><div class="v" id="limitXVal">—</div></div>
+                <div class="readout"><div class="k">f(x)</div><div class="v" id="limitFxVal">—</div></div>
+                <div class="readout"><div class="k">limit L</div><div class="v" id="limitLVal">—</div></div>
+              </div>
+              <p id="limitNote" class="margin-note teal" style="margin-top:14px;font-size:15px;"></p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="hand-tag">★ worked examples</span></h3>
+          <div id="limitExamples"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Practice</h3>
+          <div id="limitPractice"></div>
+        </div>
+      </section>
+
+      <!-- ================= CONTINUITY ================= -->
+      <section class="topic-section" id="sec-continuity">
+        <div class="section-eyebrow">Topic 1 · Foundations</div>
+        <h2 class="section-title">Continuity</h2>
+        <p class="lede">A function is continuous at $c$ when there's no gap, jump, or blow-up in its graph there — formally, when the limit at $c$ actually equals the function's value at $c$.</p>
+
+        <div class="panel">
+          <h3>Definition</h3>
+          <p>$f$ is continuous at $x=c$ if all three hold:</p>
+          <div class="formula-box">
+            $$\text{1. } f(c) \text{ is defined} \qquad \text{2. } \lim_{x\to c} f(x) \text{ exists} \qquad \text{3. } \lim_{x\to c} f(x) = f(c)$$
+          </div>
+          <table class="rules-table">
+            <tr><th>Type</th><th>What fails</th><th>Looks like</th></tr>
+            <tr><td>Removable</td><td>Limit exists, but $f(c)$ is undefined or wrong</td><td>a hole in the graph</td></tr>
+            <tr><td>Jump</td><td>Left and right limits exist but disagree</td><td>the graph steps up/down</td></tr>
+            <tr><td>Infinite</td><td>$f(x)\to\pm\infty$ near $c$</td><td>a vertical asymptote</td></tr>
+          </table>
+          <p class="margin-note">Every differentiable function is continuous — but not every continuous function is differentiable (e.g. a sharp corner like |x|).</p>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Interactive — classify each graph at the marked point</div>
+          <div id="continuityGallery" class="demo-grid"></div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="hand-tag">★ worked examples</span></h3>
+          <div id="continuityExamples"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Practice</h3>
+          <div id="continuityPractice"></div>
+        </div>
+      </section>
+
+      <!-- ================= DIFFERENTIATION ================= -->
+      <section class="topic-section" id="sec-differentiation">
+        <div class="section-eyebrow">Topic 1 · Foundations</div>
+        <h2 class="section-title">Differentiation</h2>
+        <p class="lede">The derivative is a limit: the slope of the secant line through two points on a curve, as those points merge into one. That limiting slope is the instantaneous rate of change.</p>
+
+        <div class="panel">
+          <h3>Definition</h3>
+          <div class="formula-box">$$f'(x) = \lim_{h\to 0} \frac{f(x+h)-f(x)}{h}$$</div>
+          <p>Geometrically: $\frac{f(x+h)-f(x)}{h}$ is the slope of the <b>secant line</b> through $(x, f(x))$ and $(x+h, f(x+h))$. As $h\to 0$, the secant rotates into the <b>tangent line</b> at $x$.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Differentiation rules</h3>
+          <table class="rules-table">
+            <tr><th>Rule</th><th>Formula</th></tr>
+            <tr><td>Power</td><td>$\dfrac{d}{dx}x^n = nx^{n-1}$</td></tr>
+            <tr><td>Constant multiple</td><td>$\dfrac{d}{dx}[k\,f(x)] = k\,f'(x)$</td></tr>
+            <tr><td>Sum/Difference</td><td>$(f\pm g)' = f' \pm g'$</td></tr>
+            <tr><td>Product</td><td>$(fg)' = f'g + fg'$</td></tr>
+            <tr><td>Quotient</td><td>$\left(\dfrac{f}{g}\right)' = \dfrac{f'g - fg'}{g^2}$</td></tr>
+            <tr><td>Chain</td><td>$\dfrac{d}{dx}f(g(x)) = f'(g(x))\cdot g'(x)$</td></tr>
+            <tr><td>Standard forms</td><td>$\sin'x=\cos x,\ \ \cos'x=-\sin x,\ \ (e^x)'=e^x,\ \ (\ln x)'=\tfrac1x$</td></tr>
+          </table>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Interactive — secant → tangent</div>
+          <div class="demo-grid">
+            <div class="canvas-box"><canvas id="derivCanvas"></canvas></div>
+            <div>
+              <div class="controls">
+                <div class="control-row">
+                  <label for="derivFuncSel">Function</label>
+                  <select id="derivFuncSel">
+                    <option value="quad">f(x) = x²</option>
+                    <option value="sin">f(x) = sin(x)</option>
+                    <option value="cubic">f(x) = x³ − 3x</option>
+                    <option value="exp">f(x) = eˣ</option>
+                  </select>
+                </div>
+                <div class="control-row">
+                  <label for="derivXSlider">Point x₀</label>
+                  <input type="range" id="derivXSlider" min="-2" max="2" step="0.02" value="0.8">
+                </div>
+                <div class="control-row">
+                  <label for="derivHSlider">Secant gap h</label>
+                  <input type="range" id="derivHSlider" min="0.02" max="2" step="0.01" value="1.4">
+                </div>
+              </div>
+              <div class="readout-row">
+                <div class="readout"><div class="k">secant slope</div><div class="v" id="derivSecantVal">—</div></div>
+                <div class="readout"><div class="k">f'(x₀) exact</div><div class="v" id="derivExactVal">—</div></div>
+              </div>
+              <p class="margin-note" style="margin-top:14px;">Slide h toward 0 — the red secant line locks onto the blue tangent line.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="hand-tag">★ worked examples</span></h3>
+          <div id="derivExamples"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Rules quiz</h3>
+          <div id="derivQuiz"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Practice</h3>
+          <div id="derivPractice"></div>
+        </div>
+      </section>
+
+      <div class="divider"></div>
+
+      <!-- ================= PARTIAL DERIVATIVES ================= -->
+      <section class="topic-section" id="sec-partials">
+        <div class="section-eyebrow">Topic 2 · Several Variables</div>
+        <h2 class="section-title">Partial Derivatives</h2>
+        <p class="lede">When $f$ depends on more than one variable, you can still ask "how fast does it change?" — but now you must say <em>in which direction</em>. A partial derivative freezes every variable except one.</p>
+
+        <div class="panel">
+          <h3>Definition</h3>
+          <div class="formula-box">
+            $$f_x(x,y) = \frac{\partial f}{\partial x} = \lim_{h\to0}\frac{f(x+h,y)-f(x,y)}{h} \qquad f_y(x,y) = \frac{\partial f}{\partial y} = \lim_{h\to0}\frac{f(x,y+h)-f(x,y)}{h}$$
+          </div>
+          <p>Geometrically, slice the surface $z=f(x,y)$ with the plane $y=y_0$: the resulting curve's ordinary slope, in $x$, is $f_x(x_0,y_0)$. Slice with $x=x_0$ instead and you get $f_y(x_0,y_0)$. Every other variable is just held constant — ordinary single-variable rules apply to whichever one is "active".</p>
+          <p class="margin-note">Higher-order: $f_{xx}=\partial^2f/\partial x^2$, $f_{yy}=\partial^2f/\partial y^2$, and the mixed partial $f_{xy}=\partial^2f/\partial x\partial y$. For smooth functions, $f_{xy}=f_{yx}$ (Clairaut's theorem).</p>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Interactive — slice the surface at a point</div>
+          <div class="control-row" style="margin-bottom:6px;">
+            <label for="partialFuncSel">Surface</label>
+            <select id="partialFuncSel">
+              <option value="bowl">f(x,y) = x² + y²</option>
+              <option value="saddle">f(x,y) = x² − y²</option>
+              <option value="wave">f(x,y) = sin(x)cos(y)</option>
+            </select>
+          </div>
+          <div class="demo-grid">
+            <div class="canvas-box"><canvas id="partialHeatCanvas"></canvas></div>
+            <div>
+              <div class="canvas-box small" style="margin-bottom:10px;"><canvas id="partialSliceXCanvas"></canvas></div>
+              <div class="canvas-box small"><canvas id="partialSliceYCanvas"></canvas></div>
+            </div>
+          </div>
+          <div class="controls">
+            <div class="control-row">
+              <label for="partialXSlider">x₀</label>
+              <input type="range" id="partialXSlider" min="-3" max="3" step="0.02" value="1">
+            </div>
+            <div class="control-row">
+              <label for="partialYSlider">y₀</label>
+              <input type="range" id="partialYSlider" min="-3" max="3" step="0.02" value="1">
+            </div>
+          </div>
+          <div class="readout-row">
+            <div class="readout"><div class="k">f(x₀,y₀)</div><div class="v" id="partialFVal">—</div></div>
+            <div class="readout"><div class="k">∂f/∂x at point</div><div class="v" id="partialFxVal">—</div></div>
+            <div class="readout"><div class="k">∂f/∂y at point</div><div class="v" id="partialFyVal">—</div></div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="hand-tag">★ worked examples</span></h3>
+          <div id="partialExamples"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Practice</h3>
+          <div id="partialPractice"></div>
+        </div>
+      </section>
+
+      <!-- ================= GRADIENT / DIRECTIONAL ================= -->
+      <section class="topic-section" id="sec-gradient">
+        <div class="section-eyebrow">Topic 2 · Several Variables</div>
+        <h2 class="section-title">Gradient &amp; Directional Derivatives</h2>
+        <p class="lede">The gradient bundles both partials into one vector that points in the direction of steepest ascent. Rotate that idea and you can find the rate of change in <em>any</em> direction, not just along the axes.</p>
+
+        <div class="panel">
+          <h3>Definitions</h3>
+          <div class="formula-box">$$\nabla f(x,y) = \left\langle f_x(x,y),\ f_y(x,y) \right\rangle$$</div>
+          <p>For a unit vector $\mathbf{u}=\langle \cos\theta,\sin\theta\rangle$, the <b>directional derivative</b> of $f$ at $(x_0,y_0)$ in direction $\mathbf{u}$ is</p>
+          <div class="formula-box">$$D_{\mathbf u}f(x_0,y_0) = \nabla f(x_0,y_0)\cdot \mathbf{u} = f_x(x_0,y_0)\cos\theta + f_y(x_0,y_0)\sin\theta$$</div>
+          <table class="rules-table">
+            <tr><th>Fact</th><th>Meaning</th></tr>
+            <tr><td>$\nabla f$ points toward steepest increase</td><td>Largest possible $D_{\mathbf u}f = |\nabla f|$, when $\mathbf u$ is parallel to $\nabla f$</td></tr>
+            <tr><td>$-\nabla f$ points toward steepest decrease</td><td>Smallest $D_{\mathbf u}f = -|\nabla f|$</td></tr>
+            <tr><td>$\nabla f \perp$ level curves</td><td>Direction of zero change is tangent to the contour through that point</td></tr>
+          </table>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Interactive — elevation map with gradient &amp; direction vectors</div>
+          <div class="control-row" style="margin-bottom:6px;">
+            <label for="gradFuncSel">Surface</label>
+            <select id="gradFuncSel">
+              <option value="bowl">f(x,y) = x² + y²</option>
+              <option value="saddle">f(x,y) = x² − y²</option>
+              <option value="wave">f(x,y) = sin(x)cos(y)</option>
+            </select>
+          </div>
+          <div class="demo-grid">
+            <div class="canvas-box"><canvas id="gradCanvas"></canvas><p style="font-size:12px;color:var(--ink-faint);margin:6px 2px 0;">Click anywhere on the map to move the point. Cool = low, warm = high.</p></div>
+            <div>
+              <div class="controls">
+                <div class="control-row">
+                  <label for="gradThetaSlider">Direction θ (deg)</label>
+                  <input type="range" id="gradThetaSlider" min="0" max="360" step="1" value="45">
+                </div>
+                <div class="control-row">
+                  <button class="btn small accent" id="snapGradBtn">↑ snap to ∇f (steepest ascent)</button>
+                </div>
+              </div>
+              <div class="readout-row">
+                <div class="readout"><div class="k">∇f at point</div><div class="v" id="gradVecVal">—</div></div>
+                <div class="readout"><div class="k">|∇f|</div><div class="v" id="gradMagVal">—</div></div>
+                <div class="readout"><div class="k">D_u f (θ)</div><div class="v" id="gradDirVal">—</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="hand-tag">★ worked examples</span></h3>
+          <div id="gradExamples"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Practice</h3>
+          <div id="gradPractice"></div>
+        </div>
+      </section>
+
+      <!-- ================= TANGENT PLANES / EXTREMA ================= -->
+      <section class="topic-section" id="sec-extrema">
+        <div class="section-eyebrow">Topic 2 · Several Variables</div>
+        <h2 class="section-title">Tangent Planes &amp; Extrema</h2>
+        <p class="lede">Just as a tangent line approximates a curve, a tangent plane approximates a surface near a point. And just as $f'(x)=0$ locates flat spots on a curve, $\nabla f = \mathbf 0$ locates flat spots on a surface — candidates for a max, min, or saddle.</p>
+
+        <div class="panel">
+          <h3>Tangent plane &amp; linear approximation</h3>
+          <div class="formula-box">$$z = f(x_0,y_0) + f_x(x_0,y_0)(x-x_0) + f_y(x_0,y_0)(y-y_0)$$</div>
+          <p>This plane is the best flat approximation of the surface near $(x_0,y_0)$. Writing $dx=x-x_0,\ dy=y-y_0$, the linear approximation says</p>
+          <div class="formula-box">$$f(x_0+dx,\ y_0+dy) \approx f(x_0,y_0) + f_x\,dx + f_y\,dy$$</div>
+        </div>
+
+        <div class="demo">
+          <div class="demo-label">Interactive — linear approximation vs. exact value</div>
+          <div class="control-row">
+            <label for="linFuncSel">Surface</label>
+            <select id="linFuncSel">
+              <option value="bowl">f(x,y) = x² + y²</option>
+              <option value="saddle">f(x,y) = x² − y²</option>
+              <option value="wave">f(x,y) = sin(x)cos(y)</option>
+            </select>
+          </div>
+          <div class="controls">
+            <div class="control-row">
+              <label for="linX0">x₀</label>
+              <input type="range" id="linX0" min="-3" max="3" step="0.1" value="1">
+            </div>
+            <div class="control-row">
+              <label for="linY0">y₀</label>
+              <input type="range" id="linY0" min="-3" max="3" step="0.1" value="1">
+            </div>
+            <div class="control-row">
+              <label for="linDx">dx (step in x)</label>
+              <input type="range" id="linDx" min="-1.5" max="1.5" step="0.02" value="0.6">
+            </div>
+            <div class="control-row">
+              <label for="linDy">dy (step in y)</label>
+              <input type="range" id="linDy" min="-1.5" max="1.5" step="0.02" value="0.4">
+            </div>
+          </div>
+          <div class="readout-row">
+            <div class="readout"><div class="k">exact f(x₀+dx, y₀+dy)</div><div class="v" id="linExactVal">—</div></div>
+            <div class="readout"><div class="k">linear approx L(x,y)</div><div class="v" id="linApproxVal">—</div></div>
+            <div class="readout"><div class="k">error</div><div class="v" id="linErrVal">—</div></div>
+          </div>
+          <p class="margin-note">Shrink dx and dy toward 0 — the error shrinks much faster than the step size.</p>
+        </div>
+
+        <div class="panel">
+          <h3>Classifying critical points — the second derivative test</h3>
+          <p>At a critical point where $f_x=f_y=0$, compute the discriminant</p>
+          <div class="formula-box">$$D = f_{xx}f_{yy} - (f_{xy})^2$$</div>
+          <table class="rules-table">
+            <tr><th>Condition</th><th>Conclusion</th></tr>
+            <tr><td>$D>0$ and $f_{xx}>0$</td><td>Local minimum</td></tr>
+            <tr><td>$D>0$ and $f_{xx}<0$</td><td>Local maximum</td></tr>
+            <tr><td>$D<0$</td><td>Saddle point</td></tr>
+            <tr><td>$D=0$</td><td>Test is inconclusive</td></tr>
+          </table>
+        </div>
+
+        <div class="panel">
+          <h3>Quick classify</h3>
+          <div id="extremaQuiz"></div>
+        </div>
+
+        <div class="panel">
+          <h3><span class="hand-tag">★ worked examples</span></h3>
+          <div id="extremaExamples"></div>
+        </div>
+
+        <div class="panel">
+          <h3>Practice</h3>
+          <div id="extremaPractice"></div>
+        </div>
+      </section>
+
+      <footer>Built as a study aid — check every worked example against your own textbook's conventions.</footer>
+    </div>
+  </main>
+</div>
+
+<script>
+(function(){
+  "use strict";
+
+  /* ============================================================
+     UTILITIES
+  ============================================================ */
+  function typeset(el){
+    if(window.MathJax && window.MathJax.typesetPromise){
+      window.MathJax.typesetPromise(el ? [el] : undefined).catch(function(){});
+    }
+  }
+  function fmt(n, d){
+    if(n===null || n===undefined || isNaN(n)) return '—';
+    if(!isFinite(n)) return n>0 ? '+∞' : '−∞';
+    d = d===undefined ? 3 : d;
+    var v = Number(n.toFixed(d));
+    return (v===0 ? 0 : v).toString();
+  }
+
+  var redrawFns = [];
+  function onResize(){ redrawFns.forEach(function(f){ try{ f(); }catch(e){} }); }
+  var resizeTimer;
+  window.addEventListener('resize', function(){
+    clearTimeout(resizeTimer); resizeTimer = setTimeout(onResize, 120);
+  });
+
+  function fitCanvas(canvas){
+    var dpr = window.devicePixelRatio || 1;
+    var rect = canvas.getBoundingClientRect();
+    var w = Math.max(rect.width, 10), h = Math.max(rect.height, 10);
+    canvas.width = Math.round(w*dpr);
+    canvas.height = Math.round(h*dpr);
+    var ctx = canvas.getContext('2d');
+    ctx.setTransform(dpr,0,0,dpr,0,0);
+    return { ctx: ctx, w: w, h: h };
+  }
+
+  /* Simple 2D function-plot helper */
+  function Plot2D(canvas, xMin,xMax,yMin,yMax){
+    var setup = fitCanvas(canvas);
+    this.ctx = setup.ctx; this.w = setup.w; this.h = setup.h;
+    this.xMin=xMin; this.xMax=xMax; this.yMin=yMin; this.yMax=yMax;
+  }
+  Plot2D.prototype.px = function(x,y){
+    return {
+      x: (x-this.xMin)/(this.xMax-this.xMin)*this.w,
+      y: this.h - (y-this.yMin)/(this.yMax-this.yMin)*this.h
+    };
+  };
+  Plot2D.prototype.clear = function(){
+    this.ctx.clearRect(0,0,this.w,this.h);
+    this.ctx.fillStyle = '#FCFBF8';
+    this.ctx.fillRect(0,0,this.w,this.h);
+  };
+  Plot2D.prototype.grid = function(step){
+    var ctx=this.ctx; step = step||1;
+    ctx.strokeStyle = '#E4EAF1'; ctx.lineWidth=1;
+    for(var gx=Math.ceil(this.xMin/step)*step; gx<=this.xMax; gx+=step){
+      var p=this.px(gx,0);
+      ctx.beginPath(); ctx.moveTo(p.x,0); ctx.lineTo(p.x,this.h); ctx.stroke();
+    }
+    for(var gy=Math.ceil(this.yMin/step)*step; gy<=this.yMax; gy+=step){
+      var q=this.px(0,gy);
+      ctx.beginPath(); ctx.moveTo(0,q.y); ctx.lineTo(this.w,q.y); ctx.stroke();
+    }
+  };
+  Plot2D.prototype.axes = function(){
+    var ctx=this.ctx;
+    ctx.strokeStyle = '#B9C9DC'; ctx.lineWidth=1.4;
+    if(this.xMin<=0 && this.xMax>=0){
+      var vx=this.px(0,0);
+      ctx.beginPath(); ctx.moveTo(vx.x,0); ctx.lineTo(vx.x,this.h); ctx.stroke();
+    }
+    if(this.yMin<=0 && this.yMax>=0){
+      var hy=this.px(0,0);
+      ctx.beginPath(); ctx.moveTo(0,hy.y); ctx.lineTo(this.w,hy.y); ctx.stroke();
+    }
+  };
+  Plot2D.prototype.curve = function(f, color, lw){
+    var ctx=this.ctx; ctx.strokeStyle=color||'#1B2A4A'; ctx.lineWidth=lw||2.2;
+    ctx.beginPath();
+    var started=false, N=260;
+    for(var i=0;i<=N;i++){
+      var x = this.xMin + (this.xMax-this.xMin)*i/N;
+      var y;
+      try{ y=f(x); }catch(e){ y=NaN; }
+      if(y===undefined || isNaN(y) || !isFinite(y)){ started=false; continue; }
+      if(y<this.yMin-1e6 || y>this.yMax+1e6){ started=false; continue; }
+      var p=this.px(x,y);
+      if(!started){ ctx.moveTo(p.x,p.y); started=true; } else { ctx.lineTo(p.x,p.y); }
+    }
+    ctx.stroke();
+  };
+  Plot2D.prototype.line = function(x1,y1,x2,y2,color,dash,lw){
+    var ctx=this.ctx; var a=this.px(x1,y1), b=this.px(x2,y2);
+    ctx.save();
+    ctx.strokeStyle=color; ctx.lineWidth=lw||1.6;
+    if(dash) ctx.setLineDash(dash);
+    ctx.beginPath(); ctx.moveTo(a.x,a.y); ctx.lineTo(b.x,b.y); ctx.stroke();
+    ctx.restore();
+  };
+  Plot2D.prototype.point = function(x,y,color,r){
+    var ctx=this.ctx; var p=this.px(x,y);
+    ctx.fillStyle=color||'#BE3B2E';
+    ctx.beginPath(); ctx.arc(p.x,p.y,r||5,0,Math.PI*2); ctx.fill();
+    ctx.strokeStyle='#fff'; ctx.lineWidth=1.5; ctx.stroke();
+  };
+  Plot2D.prototype.dot = function(x,y,color,r){
+    var ctx=this.ctx; var p=this.px(x,y);
+    ctx.fillStyle=color; ctx.beginPath(); ctx.arc(p.x,p.y,r||3,0,Math.PI*2); ctx.fill();
+  };
+
+  function lerpColor(c1,c2,t){
+    var r1=parseInt(c1.substr(1,2),16), g1=parseInt(c1.substr(3,2),16), b1=parseInt(c1.substr(5,2),16);
+    var r2=parseInt(c2.substr(1,2),16), g2=parseInt(c2.substr(3,2),16), b2=parseInt(c2.substr(5,2),16);
+    var r=Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), b=Math.round(b1+(b2-b1)*t);
+    return 'rgb('+r+','+g+','+b+')';
+  }
+  function colormap(t){
+    t = Math.max(0,Math.min(1,t));
+    if(t<0.5) return lerpColor('#1F7A6C','#FAFAF8', t*2);
+    return lerpColor('#FAFAF8','#BE3B2E', (t-0.5)*2);
+  }
+
+  /* ============================================================
+     FUNCTION LIBRARIES
+  ============================================================ */
+  var LIMIT_FUNCS = {
+    removable: { label:"(x²−4)/(x−2)", f:function(x){ return x===2 ? NaN : (x*x-4)/(x-2); }, c:2, L:4,
+      range:{xMin:-1,xMax:5,yMin:-1,yMax:8},
+      note:"There's a hole at x = 2, but the limit still exists — the graph approaches 4 from both sides." },
+    sinc: { label:"sin(x)/x", f:function(x){ return x===0 ? NaN : Math.sin(x)/x; }, c:0, L:1,
+      range:{xMin:-6,xMax:6,yMin:-0.5,yMax:1.4},
+      note:"A famous 0/0 form — direct substitution fails, but the limit is exactly 1." },
+    jumpInverse: { label:"1/x", f:function(x){ return x===0 ? NaN : 1/x; }, c:0, L:null,
+      range:{xMin:-3,xMax:3,yMin:-6,yMax:6},
+      note:"As x→0⁻, f(x)→−∞; as x→0⁺, f(x)→+∞. The two-sided limit does not exist." },
+    piecewiseJump: { label:"piecewise step", f:function(x){ return x<1 ? x+1 : x-1; }, c:1, L:null,
+      range:{xMin:-2,xMax:4,yMin:-2,yMax:4},
+      note:"Left-hand limit = 2, right-hand limit = 0 — they disagree, so the two-sided limit does not exist." }
+  };
+
+  var DERIV_FUNCS = {
+    quad: { label:"x²", f:function(x){return x*x;}, fp:function(x){return 2*x;}, range:{xMin:-2.2,xMax:2.2,yMin:-1,yMax:5} },
+    sin: { label:"sin(x)", f:Math.sin, fp:Math.cos, range:{xMin:-6.3,xMax:6.3,yMin:-1.6,yMax:1.6} },
+    cubic: { label:"x³−3x", f:function(x){return x*x*x-3*x;}, fp:function(x){return 3*x*x-3;}, range:{xMin:-2.4,xMax:2.4,yMin:-4,yMax:4} },
+    exp: { label:"eˣ", f:Math.exp, fp:Math.exp, range:{xMin:-2,xMax:2,yMin:-0.5,yMax:8} }
+  };
+
+  var MULTI_FUNCS = {
+    bowl: { label:"x² + y²", f:function(x,y){return x*x+y*y;}, fx:function(x,y){return 2*x;}, fy:function(x,y){return 2*y;},
+            fxx:function(){return 2;}, fyy:function(){return 2;}, fxy:function(){return 0;}, range:{min:-3,max:3} },
+    saddle: { label:"x² − y²", f:function(x,y){return x*x-y*y;}, fx:function(x,y){return 2*x;}, fy:function(x,y){return -2*y;},
+            fxx:function(){return 2;}, fyy:function(){return -2;}, fxy:function(){return 0;}, range:{min:-3,max:3} },
+    wave: { label:"sin(x)cos(y)", f:function(x,y){return Math.sin(x)*Math.cos(y);},
+            fx:function(x,y){return Math.cos(x)*Math.cos(y);}, fy:function(x,y){return -Math.sin(x)*Math.sin(y);},
+            fxx:function(x,y){return -Math.sin(x)*Math.cos(y);}, fyy:function(x,y){return -Math.sin(x)*Math.cos(y);},
+            fxy:function(x,y){return -Math.cos(x)*Math.sin(y);}, range:{min:-3.14,max:3.14} }
+  };
+
+  /* ============================================================
+     HERO DEMO
+  ============================================================ */
+  (function(){
+    var canvas = document.getElementById('heroCanvas');
+    var slider = document.getElementById('heroSlider');
+    var slopeEl = document.getElementById('heroSlope');
+    var f = Math.sin, x0 = 0.6;
+    function draw(){
+      var h = parseFloat(slider.value);
+      var plot = new Plot2D(canvas, -6.3, 6.3, -1.6, 1.6);
+      plot.clear(); plot.grid(1); plot.axes();
+      plot.curve(f, '#1B2A4A', 2.2);
+      var x1 = x0+h;
+      var y0 = f(x0), y1 = f(x1);
+      var m = (y1-y0)/h;
+      // extend secant line across visible range
+      var xa=-6.3, xb=6.3;
+      plot.line(xa, y0+m*(xa-x0), xb, y0+m*(xb-x0), '#BE3B2E', null, 2);
+      plot.point(x0,y0,'#1B2A4A',5);
+      plot.point(x1,y1,'#F5C518',5);
+      slopeEl.textContent = fmt(m,3) + '   (exact: ' + fmt(Math.cos(x0),3) + ')';
+    }
+    slider.addEventListener('input', draw);
+    redrawFns.push(draw);
+    draw();
+    // gentle autoplay toward 0 once, then stop, so it reads as "live" without being distracting
+    var playing = true;
+    var start = null;
+    function step(ts){
+      if(!playing) return;
+      if(start===null) start = ts;
+      var elapsed = (ts-start)/1000;
+      var v = 2.5*Math.exp(-elapsed/2.2);
+      if(v<0.03){ playing=false; slider.value=0.03; draw(); return; }
+      slider.value = v; draw();
+      requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+    slider.addEventListener('pointerdown', function(){ playing=false; });
+  })();
+
+  /* ============================================================
+     SIDEBAR NAV: active link + scroll
+  ============================================================ */
+  (function(){
+    var links = Array.prototype.slice.call(document.querySelectorAll('.nav-link'));
+    links.forEach(function(link){
+      link.addEventListener('click', function(){
+        var target = document.getElementById(link.getAttribute('data-target'));
+        if(target) target.scrollIntoView({behavior:'smooth', block:'start'});
+      });
+    });
+    var sections = links.map(function(l){ return document.getElementById(l.getAttribute('data-target')); });
+    function onScroll(){
+      var y = window.scrollY + 120;
+      var activeIdx = 0;
+      sections.forEach(function(s, i){ if(s && s.offsetTop <= y) activeIdx = i; });
+      links.forEach(function(l,i){ l.classList.toggle('active', i===activeIdx); });
+    }
+    window.addEventListener('scroll', onScroll);
+    onScroll();
+    window.markDone = function(sectionId){
+      var link = links.find(function(l){ return l.getAttribute('data-target')===sectionId; });
+      if(link) link.classList.add('done');
+    };
+  })();
+
+  /* ============================================================
+     EXAMPLES / helpers to build accordions & quizzes
+  ============================================================ */
+  function buildExamples(container, items){
+    items.forEach(function(item, i){
+      var wrap = document.createElement('div'); wrap.className='example';
+      var head = document.createElement('div'); head.className='example-head';
+      head.innerHTML = '<b>Example '+(i+1)+' — '+item.title+'</b><span class="example-toggle-icon">[ show ]</span>';
+      var body = document.createElement('div'); body.className='example-body';
+      body.innerHTML = item.html;
+      head.addEventListener('click', function(){
+        var open = body.classList.toggle('open');
+        head.querySelector('.example-toggle-icon').textContent = open ? '[ hide ]' : '[ show ]';
+        typeset(body);
+      });
+      wrap.appendChild(head); wrap.appendChild(body);
+      container.appendChild(wrap);
+    });
+    typeset(container);
+  }
+
+  function buildMCQuiz(container, items, sectionId){
+    items.forEach(function(item, i){
+      var card = document.createElement('div'); card.className='practice';
+      var num = document.createElement('div'); num.className='q-num'; num.textContent='Question '+(i+1);
+      var q = document.createElement('p'); q.className='q-text'; q.innerHTML = item.q;
+      var opts = document.createElement('div'); opts.className='mc-options';
+      var fb = document.createElement('div'); fb.className='feedback';
+      item.options.forEach(function(opt, oi){
+        var btn = document.createElement('button'); btn.className='mc-option'; btn.innerHTML = opt;
+        btn.addEventListener('click', function(){
+          Array.prototype.forEach.call(opts.children, function(b){ b.disabled = true; });
+          if(oi===item.correct){
+            btn.classList.add('correct');
+            fb.className='feedback ok show'; fb.innerHTML = '✓ Correct. ' + item.explain;
+          } else {
+            btn.classList.add('incorrect');
+            opts.children[item.correct].classList.add('correct');
+            fb.className='feedback no show'; fb.innerHTML = '✗ Not quite. ' + item.explain;
+          }
+          typeset(fb);
+          if(sectionId) window.markDone(sectionId);
+        });
+        opts.appendChild(btn);
+      });
+      card.appendChild(num); card.appendChild(q); card.appendChild(opts); card.appendChild(fb);
+      container.appendChild(card);
+    });
+    typeset(container);
+  }
+
+  function buildNumericPractice(container, items, sectionId){
+    items.forEach(function(item, i){
+      var card = document.createElement('div'); card.className='practice';
+      var num = document.createElement('div'); num.className='q-num'; num.textContent='Question '+(i+1);
+      var q = document.createElement('p'); q.className='q-text'; q.innerHTML = item.q;
+      var row = document.createElement('div'); row.className='num-check';
+      var input = document.createElement('input'); input.type='number'; input.step='any'; input.placeholder='your answer';
+      var btn = document.createElement('button'); btn.className='btn small'; btn.textContent='Check';
+      var reveal = document.createElement('button'); reveal.className='btn small ghost'; reveal.textContent='Show solution';
+      var fb = document.createElement('div'); fb.className='feedback';
+      btn.addEventListener('click', function(){
+        var v = parseFloat(input.value);
+        if(isNaN(v)){ fb.className='feedback no show'; fb.textContent='Enter a number first.'; return; }
+        var ok = Math.abs(v-item.answer) < (item.tol||0.05);
+        fb.className = 'feedback ' + (ok?'ok':'no') + ' show';
+        fb.innerHTML = ok ? ('✓ Correct — '+ (item.explain||'')) : ('✗ Expected ≈ '+fmt(item.answer,3)+'. '+(item.explain||''));
+        typeset(fb);
+        if(sectionId) window.markDone(sectionId);
+      });
+      reveal.addEventListener('click', function(){
+        fb.className='feedback ok show';
+        fb.innerHTML = 'Answer ≈ '+fmt(item.answer,3)+'. '+(item.explain||'');
+        typeset(fb);
+      });
+      row.appendChild(input); row.appendChild(btn); row.appendChild(reveal);
+      card.appendChild(num); card.appendChild(q); card.appendChild(row); card.appendChild(fb);
+      container.appendChild(card);
+    });
+    typeset(container);
+  }
+
+  /* ============================================================
+     LIMITS SECTION
+  ============================================================ */
+  (function(){
+    var canvas = document.getElementById('limitCanvas');
+    var sel = document.getElementById('limitFuncSel');
+    var slider = document.getElementById('limitSlider');
+    var xVal = document.getElementById('limitXVal');
+    var fxVal = document.getElementById('limitFxVal');
+    var lVal = document.getElementById('limitLVal');
+    var noteEl = document.getElementById('limitNote');
+
+    function draw(){
+      var key = sel.value, F = LIMIT_FUNCS[key];
+      var d = parseFloat(slider.value);
+      if(Math.abs(d) < 0.02) d = d<0 ? -0.02 : 0.02;
+      var x = F.c + d;
+      var y = F.f(x);
+      var r = F.range;
+      var plot = new Plot2D(canvas, r.xMin, r.xMax, r.yMin, r.yMax);
+      plot.clear(); plot.grid(1); plot.axes();
+      plot.curve(F.f, '#1B2A4A', 2.2);
+      var cy = F.L!==null ? F.L : (y);
+      if(F.L!==null){
+        plot.line(r.xMin, F.L, r.xMax, F.L, '#F5C518', [5,5], 1.6);
+      }
+      plot.line(F.c, r.yMin, F.c, r.yMax, '#B9C9DC', [3,4], 1.4);
+      if(!isNaN(y) && isFinite(y)) plot.point(x, y, '#BE3B2E', 6);
+      xVal.textContent = fmt(x,3);
+      fxVal.textContent = (isNaN(y)||!isFinite(y)) ? (isFinite(y)?'—':(y>0?'+∞':'−∞')) : fmt(y,4);
+      lVal.textContent = F.L===null ? 'does not exist' : fmt(F.L,3);
+      noteEl.textContent = F.note;
+    }
+    sel.addEventListener('change', draw);
+    slider.addEventListener('input', draw);
+
+    var animId = null;
+    function animate(fromLeft){
+      if(animId) cancelAnimationFrame(animId);
+      var t0 = null;
+      function step(ts){
+        if(t0===null) t0 = ts;
+        var elapsed = (ts-t0)/1000;
+        var mag = 1*Math.exp(-elapsed/1.3);
+        if(mag < 0.02){ slider.value = fromLeft ? -0.02 : 0.02; draw(); animId=null; return; }
+        slider.value = fromLeft ? -mag : mag;
+        draw();
+        animId = requestAnimationFrame(step);
+      }
+      animId = requestAnimationFrame(step);
+    }
+    document.getElementById('limitLeftBtn').addEventListener('click', function(){ animate(true); });
+    document.getElementById('limitRightBtn').addEventListener('click', function(){ animate(false); });
+
+    redrawFns.push(draw);
+    draw();
+
+    buildExamples(document.getElementById('limitExamples'), [
+      { title:'Factor and cancel', html:
+        '<p>Evaluate $\\lim_{x\\to2} \\dfrac{x^2-4}{x-2}$.</p><ol>'+
+        '<li>Direct substitution gives $\\frac{0}{0}$ — indeterminate, so factor first.</li>'+
+        '<li>$\\dfrac{x^2-4}{x-2} = \\dfrac{(x-2)(x+2)}{x-2} = x+2$ for $x\\neq2$.</li>'+
+        '<li>Now substitute: $\\lim_{x\\to2}(x+2) = 4$.</li></ol>'},
+      { title:'A trig limit', html:
+        '<p>Evaluate $\\lim_{x\\to0}\\dfrac{\\sin x}{x}$.</p><ol>'+
+        '<li>Substitution gives $\\frac00$, and it can\'t be factored algebraically.</li>'+
+        '<li>This is a standard limit proven via the squeeze theorem (comparing areas of triangles and a circular sector).</li>'+
+        '<li>Result: $\\lim_{x\\to0}\\dfrac{\\sin x}{x}=1$.</li></ol>'},
+      { title:'One-sided limits disagree', html:
+        '<p>For $f(x)=\\begin{cases}x+1,&x<1\\\\x-1,&x\\ge1\\end{cases}$, evaluate $\\lim_{x\\to1}f(x)$.</p><ol>'+
+        '<li>Left-hand: $\\lim_{x\\to1^-}(x+1)=2$.</li>'+
+        '<li>Right-hand: $\\lim_{x\\to1^+}(x-1)=0$.</li>'+
+        '<li>Since $2\\neq0$, the two-sided limit does not exist.</li></ol>'}
+    ]);
+
+    buildMCQuiz(document.getElementById('limitPractice'), [
+      { q:'$\\lim_{x\\to3}\\dfrac{x^2-9}{x-3} = ?$', options:['0','3','6','undefined'], correct:2,
+        explain:'Factor: $\\frac{(x-3)(x+3)}{x-3}=x+3 \\to 6$ as $x\\to3$.' },
+      { q:'$\\lim_{x\\to0}\\dfrac{\\sin(4x)}{x} = ?$', options:['1','0','4','∞'], correct:2,
+        explain:'Write $\\frac{\\sin4x}{x}=4\\cdot\\frac{\\sin4x}{4x}\\to 4\\cdot1=4$.' },
+      { q:'Which best describes $\\lim_{x\\to0}\\dfrac1{x^2}$?', options:['Equals 0','Equals 1','Does not exist (→ +∞ from both sides)','Equals −∞'], correct:2,
+        explain:'As x→0 from either side, $1/x^2\\to+\\infty$, so the limit does not exist as a finite number (though we say it diverges to +∞).' },
+      { q:'For a two-sided limit to exist at c, we need:', options:['f(c) to be defined','Left and right-hand limits to exist and be equal','f to be continuous everywhere','f(x) to be a polynomial'], correct:1,
+        explain:'The function need not even be defined at c — only the left and right limits must agree.' }
+    ], 'sec-limits');
+  })();
+
+  /* ============================================================
+     CONTINUITY SECTION
+  ============================================================ */
+  (function(){
+    var gallery = document.getElementById('continuityGallery');
+    var items = [
+      { key:'A', f:function(x){ return 0.4*x*x-1; }, c:0.6, range:{xMin:-3,xMax:3,yMin:-2,yMax:3}, answer:'continuous', label:'Graph A' },
+      { key:'B', f:function(x){ return x===1?NaN:(x*x-1)/(x-1); }, c:1, range:{xMin:-2,xMax:3,yMin:-2,yMax:4}, answer:'removable', label:'Graph B', holeAt:{x:1,y:2} },
+      { key:'C', f:function(x){ return x<1 ? x+1 : x-1.4; }, c:1, range:{xMin:-2,xMax:3,yMin:-2,yMax:3}, answer:'jump', label:'Graph C' },
+      { key:'D', f:function(x){ return x===1?NaN:1/(x-1); }, c:1, range:{xMin:-2,xMax:4,yMin:-6,yMax:6}, answer:'infinite', label:'Graph D' }
+    ];
+    var options = [
+      {v:'continuous', t:'Continuous at the marked point'},
+      {v:'removable', t:'Removable discontinuity'},
+      {v:'jump', t:'Jump discontinuity'},
+      {v:'infinite', t:'Infinite discontinuity'}
+    ];
+    items.forEach(function(item){
+      var box = document.createElement('div');
+      var cbox = document.createElement('div'); cbox.className='canvas-box small';
+      var canvas = document.createElement('canvas'); cbox.appendChild(canvas);
+      var label = document.createElement('div'); label.style.cssText='font-family:IBM Plex Mono,monospace;font-size:12px;color:var(--ink-faint);margin:6px 2px;';
+      label.textContent = item.label;
+      var opts = document.createElement('div'); opts.className='mc-options';
+      var fb = document.createElement('div'); fb.className='feedback';
+      options.forEach(function(opt){
+        var btn = document.createElement('button'); btn.className='mc-option'; btn.textContent = opt.t;
+        btn.addEventListener('click', function(){
+          Array.prototype.forEach.call(opts.children, function(b){ b.disabled=true; });
+          if(opt.v===item.answer){ btn.classList.add('correct'); fb.className='feedback ok show'; fb.textContent='✓ Correct.'; }
+          else{
+            btn.classList.add('incorrect');
+            Array.prototype.forEach.call(opts.children, function(b,i){ if(options[i].v===item.answer) b.classList.add('correct'); });
+            fb.className='feedback no show'; fb.textContent='✗ Not quite — look again at x = '+item.c+'.';
+          }
+          window.markDone('sec-continuity');
+        });
+        opts.appendChild(btn);
+      });
+      box.appendChild(cbox); box.appendChild(label); box.appendChild(opts); box.appendChild(fb);
+      gallery.appendChild(box);
+
+      function draw(){
+        var r = item.range;
+        var plot = new Plot2D(canvas, r.xMin, r.xMax, r.yMin, r.yMax);
+        plot.clear(); plot.grid(1); plot.axes();
+        plot.curve(item.f, '#1B2A4A', 2);
+        plot.line(item.c, r.yMin, item.c, r.yMax, '#F5C518', [4,4], 1.4);
+        if(item.holeAt){
+          var p = plot.px(item.holeAt.x, item.holeAt.y);
+          var ctx = plot.ctx;
+          ctx.strokeStyle='#BE3B2E'; ctx.lineWidth=2;
+          ctx.beginPath(); ctx.arc(p.x,p.y,5,0,Math.PI*2); ctx.stroke();
+        }
+      }
+      redrawFns.push(draw);
+      draw();
+    });
+
+    buildExamples(document.getElementById('continuityExamples'), [
+      { title:'Check continuity at a point', html:
+        '<p>Is $f(x)=\\dfrac{x^2-1}{x-1}$ (with $f(1)=2$ defined separately) continuous at $x=1$?</p><ol>'+
+        '<li>$f(1)=2$ is given, so condition 1 holds.</li>'+
+        '<li>$\\lim_{x\\to1}\\frac{x^2-1}{x-1}=\\lim_{x\\to1}(x+1)=2$, so the limit exists.</li>'+
+        '<li>Since the limit (2) equals $f(1)$ (2), $f$ is continuous at $x=1$ — the hole has been "patched".</li></ol>'},
+      { title:'Find a value that forces continuity', html:
+        '<p>For $f(x)=\\begin{cases}3x+k,& x<2\\\\x^2,&x\\ge2\\end{cases}$, find $k$ so $f$ is continuous at $x=2$.</p><ol>'+
+        '<li>Need left limit = right limit = f(2).</li>'+
+        '<li>Left: $3(2)+k=6+k$. Right/value: $2^2=4$.</li>'+
+        '<li>Set $6+k=4 \\Rightarrow k=-2$.</li></ol>'}
+    ]);
+
+    buildMCQuiz(document.getElementById('continuityPractice'), [
+      { q:'A function with a vertical asymptote at x = c has what kind of discontinuity there?', options:['Removable','Jump','Infinite','It is actually continuous'], correct:2,
+        explain:'The function grows without bound near c, so it is an infinite discontinuity.' },
+      { q:'If $\\lim_{x\\to c}f(x)$ exists but doesn\'t equal $f(c)$, the discontinuity is:', options:['Jump','Removable','Infinite','Not a discontinuity'], correct:1,
+        explain:'You could "remove" it by redefining f(c) to equal the limit.' },
+      { q:'Polynomials are continuous:', options:['Only at x=0','Only where they equal zero','Everywhere on the real line','Nowhere'], correct:2,
+        explain:'Polynomials are built from sums and products of continuous functions (constants and x), so they\'re continuous everywhere.' }
+    ], 'sec-continuity');
+  })();
+
+  /* ============================================================
+     DIFFERENTIATION SECTION
+  ============================================================ */
+  (function(){
+    var canvas = document.getElementById('derivCanvas');
+    var sel = document.getElementById('derivFuncSel');
+    var xSlider = document.getElementById('derivXSlider');
+    var hSlider = document.getElementById('derivHSlider');
+    var secantEl = document.getElementById('derivSecantVal');
+    var exactEl = document.getElementById('derivExactVal');
+
+    function draw(){
+      var key = sel.value, F = DERIV_FUNCS[key];
+      var x0 = parseFloat(xSlider.value);
+      var h = parseFloat(hSlider.value);
+      var r = F.range;
+      var plot = new Plot2D(canvas, r.xMin, r.xMax, r.yMin, r.yMax);
+      plot.clear(); plot.grid(1); plot.axes();
+      plot.curve(F.f, '#1B2A4A', 2.2);
+
+      var y0 = F.f(x0), x1 = x0+h, y1 = F.f(x1);
+      var secantSlope = (y1-y0)/h;
+      var exact = F.fp(x0);
+
+      // secant (red)
+      plot.line(r.xMin, y0+secantSlope*(r.xMin-x0), r.xMax, y0+secantSlope*(r.xMax-x0), '#BE3B2E', null, 2);
+      // true tangent (blue, dashed) for comparison
+      plot.line(r.xMin, y0+exact*(r.xMin-x0), r.xMax, y0+exact*(r.xMax-x0), '#1F7A6C', [6,4], 1.6);
+
+      plot.point(x0,y0,'#1B2A4A',5);
+      plot.point(x1,y1,'#F5C518',5);
+
+      secantEl.textContent = fmt(secantSlope,4);
+      exactEl.textContent = fmt(exact,4);
+    }
+    sel.addEventListener('change', draw);
+    xSlider.addEventListener('input', draw);
+    hSlider.addEventListener('input', draw);
+    redrawFns.push(draw);
+    draw();
+
+    buildExamples(document.getElementById('derivExamples'), [
+      { title:'Power rule', html:
+        '<p>Differentiate $f(x)=4x^5-3x^2+7$.</p><ol>'+
+        '<li>$\\dfrac{d}{dx}4x^5 = 20x^4$.</li>'+
+        '<li>$\\dfrac{d}{dx}(-3x^2) = -6x$.</li>'+
+        '<li>Derivative of a constant is 0.</li>'+
+        '<li>$f\'(x) = 20x^4-6x$.</li></ol>'},
+      { title:'Product rule', html:
+        '<p>Differentiate $f(x)=x^2\\sin x$.</p><ol>'+
+        '<li>Let $u=x^2$, $v=\\sin x$, so $u\'=2x$, $v\'=\\cos x$.</li>'+
+        '<li>$(uv)\' = u\'v+uv\' = 2x\\sin x + x^2\\cos x$.</li></ol>'},
+      { title:'Quotient rule', html:
+        '<p>Differentiate $f(x)=\\dfrac{2x+1}{x-3}$.</p><ol>'+
+        '<li>$u=2x+1,\\ v=x-3 \\Rightarrow u\'=2,\\ v\'=1$.</li>'+
+        '<li>$f\'(x)=\\dfrac{u\'v-uv\'}{v^2}=\\dfrac{2(x-3)-(2x+1)(1)}{(x-3)^2}$.</li>'+
+        '<li>Simplify numerator: $2x-6-2x-1=-7$.</li>'+
+        '<li>$f\'(x)=\\dfrac{-7}{(x-3)^2}$.</li></ol>'},
+      { title:'Chain rule', html:
+        '<p>Differentiate $f(x)=\\sin(3x^2)$.</p><ol>'+
+        '<li>Outer function $\\sin(u)$ with $u=3x^2$; outer derivative $\\cos(u)$.</li>'+
+        '<li>Inner derivative $u\'=6x$.</li>'+
+        '<li>$f\'(x)=\\cos(3x^2)\\cdot6x = 6x\\cos(3x^2)$.</li></ol>'}
+    ]);
+
+    buildMCQuiz(document.getElementById('derivQuiz'), [
+      { q:'$\\dfrac{d}{dx}\\,x^5 = ?$', options:['$x^4$','$5x^4$','$5x^5$','$\\frac15 x^4$'], correct:1, explain:'Power rule: bring the exponent down and reduce it by 1.' },
+      { q:'$\\dfrac{d}{dx}\\,[3x^2\\sin x] = ?$', options:['$6x\\cos x$','$6x\\sin x + 3x^2\\cos x$','$3x^2\\cos x$','$6x\\sin x - 3x^2\\cos x$'], correct:1, explain:'Product rule: $u\'v+uv\'$ with $u=3x^2,\\ v=\\sin x$.' },
+      { q:'$\\dfrac{d}{dx}\\left[\\dfrac{2x+1}{x-3}\\right] = ?$', options:['$\\frac{2}{1}$','$\\frac{-7}{(x-3)^2}$','$\\frac{7}{(x-3)^2}$','$\\frac{2x-6}{(x-3)^2}$'], correct:1, explain:'Quotient rule gives numerator $2(x-3)-(2x+1)= -7$.' },
+      { q:'$\\dfrac{d}{dx}\\,\\sin(3x^2) = ?$', options:['$\\cos(3x^2)$','$3\\cos(3x^2)$','$6x\\cos(3x^2)$','$6x\\sin(3x^2)$'], correct:2, explain:'Chain rule: derivative of the outside times derivative of the inside ($6x$).' }
+    ]);
+
+    buildNumericPractice(document.getElementById('derivPractice'), [
+      { q:'If $f(x)=x^3-4x$, find $f\'(2)$.', answer:8, tol:0.1, explain:'$f\'(x)=3x^2-4 \\Rightarrow f\'(2)=12-4=8$.' },
+      { q:'If $f(x)=\\dfrac{1}{x}$, find $f\'(2)$ (as a decimal).', answer:-0.25, tol:0.02, explain:'$f\'(x)=-\\frac1{x^2} \\Rightarrow f\'(2)=-0.25$.' },
+      { q:'Find the slope of the tangent to $y=\\cos x$ at $x=0$.', answer:0, tol:0.05, explain:'$y\'=-\\sin x \\Rightarrow$ at $x=0$, slope $=0$.' }
+    ], 'sec-differentiation');
+  })();
+
+  /* ============================================================
+     PARTIAL DERIVATIVES SECTION
+  ============================================================ */
+  (function(){
+    var heatCanvas = document.getElementById('partialHeatCanvas');
+    var sliceXCanvas = document.getElementById('partialSliceXCanvas');
+    var sliceYCanvas = document.getElementById('partialSliceYCanvas');
+    var sel = document.getElementById('partialFuncSel');
+    var xSlider = document.getElementById('partialXSlider');
+    var ySlider = document.getElementById('partialYSlider');
+    var fVal = document.getElementById('partialFVal');
+    var fxVal = document.getElementById('partialFxVal');
+    var fyVal = document.getElementById('partialFyVal');
+
+    var heatCache = {};
+    function getHeat(key, rr){
+      var cacheKey = key+'|'+rr.min+'|'+rr.max;
+      if(heatCache[cacheKey]) return heatCache[cacheKey];
+      var F = MULTI_FUNCS[key];
+      var off = document.createElement('canvas');
+      var setup = fitCanvas(heatCanvas);
+      off.width = setup.w; off.height = setup.h;
+      var octx = off.getContext('2d');
+      var cell = 6, cols = Math.ceil(setup.w/cell), rows = Math.ceil(setup.h/cell);
+      var minV=Infinity, maxV=-Infinity, grid=[];
+      for(var j=0;j<rows;j++){ grid[j]=[];
+        for(var i=0;i<cols;i++){
+          var x = rr.min + (rr.max-rr.min)*(i*cell)/setup.w;
+          var y = rr.max - (rr.max-rr.min)*(j*cell)/setup.h;
+          var v = F.f(x,y);
+          grid[j][i]=v; if(v<minV)minV=v; if(v>maxV)maxV=v;
+        }
+      }
+      for(var j2=0;j2<rows;j2++){
+        for(var i2=0;i2<cols;i2++){
+          var t = (grid[j2][i2]-minV)/((maxV-minV)||1);
+          octx.fillStyle = colormap(t);
+          octx.fillRect(i2*cell, j2*cell, cell+1, cell+1);
+        }
+      }
+      heatCache[cacheKey] = { canvas: off, w: setup.w, h: setup.h, dpr: window.devicePixelRatio||1 };
+      return heatCache[cacheKey];
+    }
+
+    function drawHeat(){
+      var key = sel.value, F = MULTI_FUNCS[key], rr = F.range;
+      var x0 = parseFloat(xSlider.value), y0 = parseFloat(ySlider.value);
+      x0 = Math.max(rr.min, Math.min(rr.max, x0));
+      y0 = Math.max(rr.min, Math.min(rr.max, y0));
+      var setup = fitCanvas(heatCanvas);
+      var ctx = setup.ctx;
+      var cached = getHeat(key, rr);
+      ctx.save(); ctx.setTransform(1,0,0,1,0,0);
+      ctx.drawImage(cached.canvas, 0, 0);
+      ctx.restore();
+      // overlay point + crosshair (using logical coords / dpr-aware ctx already transformed by fitCanvas)
+      var px = (x0-rr.min)/(rr.max-rr.min)*setup.w;
+      var py = setup.h - (y0-rr.min)/(rr.max-rr.min)*setup.h;
+      ctx.strokeStyle='rgba(27,42,74,0.55)'; ctx.setLineDash([4,4]); ctx.lineWidth=1.2;
+      ctx.beginPath(); ctx.moveTo(px,0); ctx.lineTo(px,setup.h); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(0,py); ctx.lineTo(setup.w,py); ctx.stroke();
+      ctx.setLineDash([]);
+      ctx.fillStyle='#1B2A4A'; ctx.beginPath(); ctx.arc(px,py,6,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+
+      var fv = F.f(x0,y0), fx = F.fx(x0,y0), fy = F.fy(x0,y0);
+      fVal.textContent = fmt(fv,3);
+      fxVal.textContent = fmt(fx,3);
+      fyVal.textContent = fmt(fy,3);
+
+      // slice X: f(x, y0) vs x
+      var pX = new Plot2D(sliceXCanvas, rr.min, rr.max, -Math.max(2,Math.abs(rr.min*rr.min))*1.2, Math.max(4, F.f(rr.max,0)+2));
+      // compute reasonable y-range by sampling
+      var ys=[]; for(var i=0;i<=40;i++){ var xx=rr.min+(rr.max-rr.min)*i/40; ys.push(F.f(xx,y0)); }
+      var yMinS=Math.min.apply(null,ys), yMaxS=Math.max.apply(null,ys);
+      var pad=(yMaxS-yMinS)*0.2+0.3;
+      pX = new Plot2D(sliceXCanvas, rr.min, rr.max, yMinS-pad, yMaxS+pad);
+      pX.clear(); pX.grid((rr.max-rr.min)/6); pX.axes();
+      pX.curve(function(x){ return F.f(x,y0); }, '#1B2A4A', 2);
+      var fxSlope = F.fx(x0,y0), f0 = F.f(x0,y0);
+      pX.line(rr.min, f0+fxSlope*(rr.min-x0), rr.max, f0+fxSlope*(rr.max-x0), '#BE3B2E', null, 2);
+      pX.point(x0, f0, '#F5C518', 5);
+      var ctxLbl = pX.ctx; ctxLbl.fillStyle='#4E5D7C'; ctxLbl.font='11px IBM Plex Mono'; ctxLbl.fillText('slice: f(x, '+fmt(y0,2)+')  —  slope = ∂f/∂x', 8, 14);
+
+      // slice Y: f(x0, y) vs y
+      var ys2=[]; for(var j=0;j<=40;j++){ var yy=rr.min+(rr.max-rr.min)*j/40; ys2.push(F.f(x0,yy)); }
+      var yMinS2=Math.min.apply(null,ys2), yMaxS2=Math.max.apply(null,ys2);
+      var pad2=(yMaxS2-yMinS2)*0.2+0.3;
+      var pY = new Plot2D(sliceYCanvas, rr.min, rr.max, yMinS2-pad2, yMaxS2+pad2);
+      pY.clear(); pY.grid((rr.max-rr.min)/6); pY.axes();
+      pY.curve(function(y){ return F.f(x0,y); }, '#1B2A4A', 2);
+      var fySlope = F.fy(x0,y0);
+      pY.line(rr.min, f0+fySlope*(rr.min-y0), rr.max, f0+fySlope*(rr.max-y0), '#BE3B2E', null, 2);
+      pY.point(y0, f0, '#F5C518', 5);
+      var ctxLbl2 = pY.ctx; ctxLbl2.fillStyle='#4E5D7C'; ctxLbl2.font='11px IBM Plex Mono'; ctxLbl2.fillText('slice: f('+fmt(x0,2)+', y)  —  slope = ∂f/∂y', 8, 14);
+    }
+    sel.addEventListener('change', function(){ drawHeat(); });
+    xSlider.addEventListener('input', drawHeat);
+    ySlider.addEventListener('input', drawHeat);
+    redrawFns.push(drawHeat);
+    drawHeat();
+
+    buildExamples(document.getElementById('partialExamples'), [
+      { title:'Basic partials', html:
+        '<p>Find $f_x$ and $f_y$ for $f(x,y)=x^2y^3+4x$.</p><ol>'+
+        '<li>Treat y as constant, differentiate in x: $f_x = 2xy^3+4$.</li>'+
+        '<li>Treat x as constant, differentiate in y: $f_y = 3x^2y^2$.</li></ol>'},
+      { title:'Partials with a product', html:
+        '<p>Find $f_x$ and $f_y$ for $f(x,y)=e^{x}\\sin y$.</p><ol>'+
+        '<li>$f_x = e^{x}\\sin y$ (only x-part changes).</li>'+
+        '<li>$f_y = e^{x}\\cos y$ (only y-part changes).</li></ol>'},
+      { title:'Mixed second partial', html:
+        '<p>For $f(x,y)=x^3y^2$, verify $f_{xy}=f_{yx}$.</p><ol>'+
+        '<li>$f_x=3x^2y^2 \\Rightarrow f_{xy}=6x^2y$.</li>'+
+        '<li>$f_y=2x^3y \\Rightarrow f_{yx}=6x^2y$.</li>'+
+        '<li>Equal, as Clairaut\'s theorem guarantees for smooth functions.</li></ol>'}
+    ]);
+
+    buildNumericPractice(document.getElementById('partialPractice'), [
+      { q:'For $f(x,y)=x^2y+3y^2$, find $f_x(1,2)$.', answer:4, tol:0.1, explain:'$f_x=2xy \\Rightarrow f_x(1,2)=2(1)(2)=4$.' },
+      { q:'For $f(x,y)=x^2y+3y^2$, find $f_y(1,2)$.', answer:13, tol:0.1, explain:'$f_y=x^2+6y \\Rightarrow f_y(1,2)=1+12=13$.' },
+      { q:'For $f(x,y)=\\sin(x)\\cos(y)$, find $f_x(0,0)$.', answer:1, tol:0.05, explain:'$f_x=\\cos x\\cos y \\Rightarrow f_x(0,0)=1\\cdot1=1$.' }
+    ], 'sec-partials');
+  })();
+
+  /* ============================================================
+     GRADIENT / DIRECTIONAL DERIVATIVE SECTION
+  ============================================================ */
+  (function(){
+    var canvas = document.getElementById('gradCanvas');
+    var sel = document.getElementById('gradFuncSel');
+    var thetaSlider = document.getElementById('gradThetaSlider');
+    var vecVal = document.getElementById('gradVecVal');
+    var magVal = document.getElementById('gradMagVal');
+    var dirVal = document.getElementById('gradDirVal');
+    var snapBtn = document.getElementById('snapGradBtn');
+
+    var point = {x:1,y:1};
+    var heatCache2 = {};
+    function getHeat(key, rr){
+      var cacheKey = key+'|'+rr.min+'|'+rr.max;
+      if(heatCache2[cacheKey]) return heatCache2[cacheKey];
+      var F = MULTI_FUNCS[key];
+      var setup = fitCanvas(canvas);
+      var off = document.createElement('canvas'); off.width=setup.w; off.height=setup.h;
+      var octx = off.getContext('2d');
+      var cell=6, cols=Math.ceil(setup.w/cell), rows=Math.ceil(setup.h/cell);
+      var minV=Infinity,maxV=-Infinity,grid=[];
+      for(var j=0;j<rows;j++){ grid[j]=[];
+        for(var i=0;i<cols;i++){
+          var x=rr.min+(rr.max-rr.min)*(i*cell)/setup.w;
+          var y=rr.max-(rr.max-rr.min)*(j*cell)/setup.h;
+          var v=F.f(x,y); grid[j][i]=v; if(v<minV)minV=v; if(v>maxV)maxV=v;
+        }
+      }
+      for(var j2=0;j2<rows;j2++) for(var i2=0;i2<cols;i2++){
+        var t=(grid[j2][i2]-minV)/((maxV-minV)||1);
+        octx.fillStyle=colormap(t); octx.fillRect(i2*cell,j2*cell,cell+1,cell+1);
+      }
+      heatCache2[cacheKey] = {canvas:off, w:setup.w, h:setup.h};
+      return heatCache2[cacheKey];
+    }
+
+    function toPx(x,y,rr,w,h){ return { x:(x-rr.min)/(rr.max-rr.min)*w, y: h-(y-rr.min)/(rr.max-rr.min)*h }; }
+    function toXY(px,py,rr,w,h){ return { x: rr.min+(px/w)*(rr.max-rr.min), y: rr.min+((h-py)/h)*(rr.max-rr.min) }; }
+
+    function draw(){
+      var key = sel.value, F = MULTI_FUNCS[key], rr = F.range;
+      point.x = Math.max(rr.min, Math.min(rr.max, point.x));
+      point.y = Math.max(rr.min, Math.min(rr.max, point.y));
+      var setup = fitCanvas(canvas);
+      var ctx = setup.ctx;
+      var cached = getHeat(key, rr);
+      ctx.save(); ctx.setTransform(1,0,0,1,0,0); ctx.drawImage(cached.canvas,0,0); ctx.restore();
+
+      var p = toPx(point.x, point.y, rr, setup.w, setup.h);
+      var fx = F.fx(point.x, point.y), fy = F.fy(point.x, point.y);
+      var mag = Math.sqrt(fx*fx+fy*fy) || 1e-9;
+      var theta = parseFloat(thetaSlider.value) * Math.PI/180;
+      var u = { x: Math.cos(theta), y: Math.sin(theta) };
+      var Duf = fx*u.x + fy*u.y;
+
+      var scale = (setup.w/(rr.max-rr.min)) * 0.6;
+
+      function arrow(dx,dy,color,lw){
+        var ex = p.x + dx*scale, ey = p.y - dy*scale;
+        ctx.strokeStyle=color; ctx.fillStyle=color; ctx.lineWidth=lw||2.4;
+        ctx.beginPath(); ctx.moveTo(p.x,p.y); ctx.lineTo(ex,ey); ctx.stroke();
+        var ang = Math.atan2(ey-p.y, ex-p.x);
+        ctx.beginPath();
+        ctx.moveTo(ex,ey);
+        ctx.lineTo(ex-9*Math.cos(ang-0.35), ey-9*Math.sin(ang-0.35));
+        ctx.lineTo(ex-9*Math.cos(ang+0.35), ey-9*Math.sin(ang+0.35));
+        ctx.closePath(); ctx.fill();
+      }
+      // gradient arrow (teal), direction arrow (pen red)
+      var normFx = fx/mag, normFy = fy/mag;
+      arrow(normFx*0.9, normFy*0.9, '#1F7A6C', 2.6);
+      arrow(u.x*0.9, u.y*0.9, '#BE3B2E', 2.2);
+
+      ctx.fillStyle='#1B2A4A';
+      ctx.beginPath(); ctx.arc(p.x,p.y,6,0,Math.PI*2); ctx.fill();
+      ctx.strokeStyle='#fff'; ctx.lineWidth=2; ctx.stroke();
+
+      vecVal.textContent = '⟨'+fmt(fx,2)+', '+fmt(fy,2)+'⟩';
+      magVal.textContent = fmt(mag,3);
+      dirVal.textContent = fmt(Duf,3);
+    }
+    sel.addEventListener('change', function(){ point.x=1; point.y=1; draw(); });
+    thetaSlider.addEventListener('input', draw);
+    snapBtn.addEventListener('click', function(){
+      var key = sel.value, F = MULTI_FUNCS[key];
+      var fx = F.fx(point.x,point.y), fy=F.fy(point.x,point.y);
+      var ang = Math.atan2(fy,fx)*180/Math.PI; if(ang<0) ang+=360;
+      thetaSlider.value = Math.round(ang);
+      draw();
+    });
+    canvas.addEventListener('click', function(ev){
+      var key = sel.value, F = MULTI_FUNCS[key], rr = F.range;
+      var rect = canvas.getBoundingClientRect();
+      var px = ev.clientX-rect.left, py = ev.clientY-rect.top;
+      var xy = toXY(px,py,rr,rect.width,rect.height);
+      point.x = xy.x; point.y = xy.y;
+      draw();
+    });
+    redrawFns.push(draw);
+    draw();
+
+    buildExamples(document.getElementById('gradExamples'), [
+      { title:'Compute a gradient', html:
+        '<p>Find $\\nabla f$ for $f(x,y)=x^2y+e^{y}$ at $(2,0)$.</p><ol>'+
+        '<li>$f_x=2xy \\Rightarrow f_x(2,0)=0$.</li>'+
+        '<li>$f_y=x^2+e^{y} \\Rightarrow f_y(2,0)=4+1=5$.</li>'+
+        '<li>$\\nabla f(2,0) = \\langle 0,\\ 5\\rangle$.</li></ol>'},
+      { title:'Directional derivative', html:
+        '<p>For $f(x,y)=x^2+y^2$ at $(1,1)$, find the rate of change toward $\\mathbf u=\\langle \\tfrac{1}{\\sqrt2},\\tfrac{1}{\\sqrt2}\\rangle$.</p><ol>'+
+        '<li>$\\nabla f(1,1) = \\langle 2,2\\rangle$.</li>'+
+        '<li>$D_{\\mathbf u}f = \\langle2,2\\rangle\\cdot\\langle\\tfrac1{\\sqrt2},\\tfrac1{\\sqrt2}\\rangle = \\tfrac{2}{\\sqrt2}+\\tfrac{2}{\\sqrt2}=2\\sqrt2\\approx2.83$.</li></ol>'}
+    ]);
+
+    buildMCQuiz(document.getElementById('gradPractice'), [
+      { q:'For $f(x,y)=x^2+y^2$, in which direction does f increase fastest at (1,1)?', options:['Along ⟨1,0⟩','Along ⟨1,1⟩ (away from origin)','Along ⟨−1,−1⟩ (toward origin)','It increases equally in every direction'], correct:1,
+        explain:'∇f(1,1)=⟨2,2⟩, which points away from the origin along ⟨1,1⟩ — that\'s the direction of steepest ascent.' },
+      { q:'The directional derivative in the direction of −∇f gives the:', options:['Maximum rate of increase','Maximum rate of decrease','Zero rate of change','Undefined value'], correct:1,
+        explain:'Moving opposite the gradient decreases f as fast as possible.' },
+      { q:'A direction along a level curve gives a directional derivative of:', options:['|∇f|','−|∇f|','0','Undefined'], correct:2,
+        explain:'∇f is perpendicular to level curves, so moving along one gives zero rate of change.' }
+    ], 'sec-gradient');
+  })();
+
+  /* ============================================================
+     TANGENT PLANES / EXTREMA SECTION
+  ============================================================ */
+  (function(){
+    var sel = document.getElementById('linFuncSel');
+    var x0s = document.getElementById('linX0'), y0s = document.getElementById('linY0');
+    var dxs = document.getElementById('linDx'), dys = document.getElementById('linDy');
+    var exactEl = document.getElementById('linExactVal'), approxEl = document.getElementById('linApproxVal'), errEl = document.getElementById('linErrVal');
+
+    function update(){
+      var F = MULTI_FUNCS[sel.value];
+      var x0=parseFloat(x0s.value), y0=parseFloat(y0s.value), dx=parseFloat(dxs.value), dy=parseFloat(dys.value);
+      var exact = F.f(x0+dx, y0+dy);
+      var approx = F.f(x0,y0) + F.fx(x0,y0)*dx + F.fy(x0,y0)*dy;
+      exactEl.textContent = fmt(exact,4);
+      approxEl.textContent = fmt(approx,4);
+      errEl.textContent = fmt(Math.abs(exact-approx),4);
+    }
+    [sel,x0s,y0s,dxs,dys].forEach(function(el){ el.addEventListener('input', update); el.addEventListener('change', update); });
+    update();
+
+    buildExamples(document.getElementById('extremaExamples'), [
+      { title:'Tangent plane', html:
+        '<p>Find the tangent plane to $f(x,y)=x^2+y^2$ at $(1,2)$.</p><ol>'+
+        '<li>$f(1,2)=5$, $f_x=2x\\Rightarrow f_x(1,2)=2$, $f_y=2y\\Rightarrow f_y(1,2)=4$.</li>'+
+        '<li>$z = 5 + 2(x-1) + 4(y-2)$.</li>'+
+        '<li>Simplify: $z = 2x+4y-5$.</li></ol>'},
+      { title:'Find and classify a critical point', html:
+        '<p>Classify the critical point of $f(x,y)=x^2+y^2$.</p><ol>'+
+        '<li>$f_x=2x=0,\\ f_y=2y=0 \\Rightarrow (0,0)$ is the only critical point.</li>'+
+        '<li>$f_{xx}=2,\\ f_{yy}=2,\\ f_{xy}=0 \\Rightarrow D = 2\\cdot2-0^2=4>0$.</li>'+
+        '<li>Since $D>0$ and $f_{xx}>0$: local (in fact global) minimum at (0,0).</li></ol>'},
+      { title:'Saddle point', html:
+        '<p>Classify the critical point of $f(x,y)=x^2-y^2$.</p><ol>'+
+        '<li>$f_x=2x=0,\\ f_y=-2y=0\\Rightarrow(0,0)$.</li>'+
+        '<li>$f_{xx}=2,\\ f_{yy}=-2,\\ f_{xy}=0\\Rightarrow D=(2)(-2)-0=-4<0$.</li>'+
+        '<li>$D<0$ means (0,0) is a saddle point — a min along one axis and a max along the other.</li></ol>'}
+    ]);
+
+    buildMCQuiz(document.getElementById('extremaQuiz'), [
+      { q:'At a critical point, $f_{xx}=3,\\ f_{yy}=4,\\ f_{xy}=1$. Classify it.', options:['Local minimum','Local maximum','Saddle point','Test inconclusive'], correct:0,
+        explain:'D = (3)(4)−1² = 11 > 0 and f_xx = 3 > 0, so it\'s a local minimum.' },
+      { q:'At a critical point, $f_{xx}=-2,\\ f_{yy}=-5,\\ f_{xy}=1$. Classify it.', options:['Local minimum','Local maximum','Saddle point','Test inconclusive'], correct:1,
+        explain:'D = (−2)(−5)−1² = 9 > 0 and f_xx < 0, so it\'s a local maximum.' },
+      { q:'At a critical point, $f_{xx}=4,\\ f_{yy}=1,\\ f_{xy}=3$. Classify it.', options:['Local minimum','Local maximum','Saddle point','Test inconclusive'], correct:2,
+        explain:'D = (4)(1)−3² = −5 < 0, so it\'s a saddle point regardless of the sign of f_xx.' }
+    ], 'sec-extrema');
+
+    buildNumericPractice(document.getElementById('extremaPractice'), [
+      { q:'For $f(x,y)=x^2+y^2$, using the tangent plane at (1,1), estimate $f(1.1, 0.9)$.', answer:2.0, tol:0.08,
+        explain:'L(x,y)=2+2(x-1)+2(y-1); at (1.1,0.9): 2+2(0.1)+2(-0.1)=2.0 (exact value is 2.02).' }
+    ], 'sec-extrema');
+  })();
+
+  // Initial MathJax typeset for static content
+  window.addEventListener('load', function(){ typeset(); onResize(); });
+})();
+</script>
+</body>
+</html>
